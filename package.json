@@ -1,0 +1,40 @@
+{
+  "name": "hubot-pg-brain",
+  "description": "Hubot brain powered by JSON postgresql",
+  "version": "0.0.0",
+  "author": "Yannick <yannick@yannick.io>",
+  "license": "MIT",
+
+  "keywords": [
+    "hubot",
+    "hubot-scripts",
+    "postgresql"
+  ],
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ys/hubot-pg-brain.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/ys/hubot-pg-brain/issues"
+  },
+
+  "dependencies": {
+    "coffee-script": "~1.6",
+    "pg": "~3.6.3"
+  },
+
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*"
+  },
+
+  "main": "index.coffee",
+
+  "scripts": {
+    "test": "script/test"
+  }
+}
