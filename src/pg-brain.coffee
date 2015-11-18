@@ -8,9 +8,10 @@
 #   Run the following SQL to setup the table and column for storage.
 #
 #   CREATE TABLE brain (
-#     key TEXT unique,
+#     key TEXT,
+#     type TEXT,
 #     value JSON default '{}'::json,
-#     CONSTRAINT brain_pkey PRIMARY KEY (key)
+#     CONSTRAINT brain_pkey PRIMARY KEY (key, type)
 #   )
 #
 # Author:
@@ -30,23 +31,24 @@ module.exports = (robot) ->
   client.connect()
   robot.logger.debug "pg-brain connected to #{database_url}."
 
-  query = client.query("SELECT key, value FROM brain")
-  query.on 'row', (row) ->
+  query = client.query "SELECT key, type, value FROM brain", (err, result) =>
+    if(err)
+      return robot.logger.error('error running query', err)
     data = {}
-    data[row.key] = value
+    for row in result.rows
+      data[row.type] ||= {}
+      data[row.type][row.key] = row.value
     robot.brain.mergeData data
-    robot.logger.debug "pg-brain loaded. #{row.key}"
-
-  client.on "error", (err) ->
-    robot.logger.error err
+    robot.logger.debug "pg-brain loaded."
 
   robot.brain.on 'save', (data) ->
-    for key, value of data
-      query = client.query("INSERT INTO brain(key, value)  VALUES ($1, $2)", [key, value])
-      query.on "error", (err) ->
-        console.log err
-          query = client.query("UPDATE brain SET value = $2 WHERE key = $1", [key, value])
-      robot.logger.debug "pg-brain saved. #{key}"
+    for type, keyValue of data
+      for key, value of keyValue
+        query = client.query("INSERT INTO brain(key, type, value)  VALUES ($1, $2, $3)", [key, type, value])
+        query.on "error", (err) ->
+          console.log err
+            query = client.query("UPDATE brain SET value = $3 WHERE key = $1 AND type = $2", [key, type, value])
+    robot.logger.debug "pg-brain saved. #{key}"
 
   robot.brain.on 'close', ->
     client.end()
