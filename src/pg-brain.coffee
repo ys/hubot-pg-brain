@@ -46,8 +46,7 @@ module.exports = (robot) ->
       for key, value of keyValue
         query = client.query("INSERT INTO brain(key, type, value)  VALUES ($1, $2, $3)", [key, type, value])
         query.on "error", (err) ->
-          console.log err
-            query = client.query("UPDATE brain SET value = $3 WHERE key = $1 AND type = $2", [key, type, value])
+          query = client.query("UPDATE brain SET value = $3 WHERE key = $1 AND type = $2", [key, type, value])
     robot.logger.debug "pg-brain saved. #{key}"
 
   robot.brain.on 'close', ->
